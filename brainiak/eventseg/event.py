@@ -164,7 +164,7 @@ class EventSegment(BaseEstimator):
 
         return X
 
-    def fit(self, X, y=None):
+    def fit(self, X, censored, y=None):
         """Learn a segmentation on training data
 
         Fits event patterns and a segmentation to training data. After
@@ -212,7 +212,7 @@ class EventSegment(BaseEstimator):
             # segmentation
             self.ll_ = np.append(self.ll_, np.empty((1, n_train)), axis=0)
             for i in range(n_train):
-                logprob = self._logprob_obs(X[i], mean_pat, iteration_var)
+                logprob = self._logprob_obs(X[i], mean_pat, iteration_var, censored)
                 log_gamma[i], self.ll_[-1, i] = self._forward_backward(logprob)
 
             if step > 1 and self.split_merge:
@@ -235,7 +235,7 @@ class EventSegment(BaseEstimator):
 
         return self
 
-    def _logprob_obs(self, data, mean_pat, var):
+    def _logprob_obs(self, data, mean_pat, var, censored):
         """Log probability of observing each timepoint under each event model
 
         Computes the log probability of each observed timepoint being
@@ -258,7 +258,7 @@ class EventSegment(BaseEstimator):
         logprob : time by event ndarray
             Log probability of each timepoint under each event Gaussian
         """
-
+        
         n_vox = data.shape[0]
         t = data.shape[1]
 
@@ -451,7 +451,7 @@ class EventSegment(BaseEstimator):
         else:
             mean_pat = self.event_pat_
 
-        logprob = self._logprob_obs(testing_data.T, mean_pat, var)
+        logprob = self._logprob_obs(testing_data.T, mean_pat, var, censored)
         lg, test_ll = self._forward_backward(logprob)
         segments = np.exp(lg)
 
@@ -677,7 +677,7 @@ class EventSegment(BaseEstimator):
             log_gamma_ms = list()
             for i in range(n_train):
                 logprob = self._logprob_obs(X[i],
-                                            mean_pat_ms, iteration_var)
+                                            mean_pat_ms, iteration_var, censored)
                 lg, ll_ms[i] = self._forward_backward(logprob)
                 log_gamma_ms.append(lg)
 

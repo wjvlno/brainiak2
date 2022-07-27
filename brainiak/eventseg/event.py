@@ -276,8 +276,6 @@ class EventSegment(BaseEstimator):
         for k in range(self.n_events):
             timepoint_var = var[k] * np.ones(t) + 100 * censored
             logprob[:, k] = -0.5 * n_vox * np.log(
-                2 * np.pi * var[k]) - 0.5 * np.sum(
-                (data_z.T - mean_pat_z[:, k]).T ** 2, axis=0) / var[k]
                 2 * np.pi * timepoint_var) - 0.5 * np.sum(
                 (data_z.T - mean_pat_z[:, k]).T ** 2, axis=0) / timepoint_var
 

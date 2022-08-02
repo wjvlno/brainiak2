@@ -218,7 +218,7 @@ class EventSegment(BaseEstimator):
             if step > 1 and self.split_merge:
                 curr_ll = np.mean(self.ll_[-1, :])
                 self.ll_[-1, :], log_gamma, mean_pat = \
-                    self._split_merge(X, log_gamma, iteration_var, curr_ll)
+                    self._split_merge(X, log_gamma, iteration_var, curr_ll, censored)
 
             # If log-likelihood has started decreasing, undo last step and stop
             if np.mean(self.ll_[-1, :]) < best_ll:
@@ -540,7 +540,7 @@ class EventSegment(BaseEstimator):
 
         return segments, test_ll
 
-    def _split_merge(self, X, log_gamma, iteration_var, curr_ll):
+    def _split_merge(self, X, log_gamma, iteration_var, curr_ll, censored):
         """Attempt to improve log-likelihood with a merge/split
 
         The simulated annealing used in fit() is susceptible to getting
